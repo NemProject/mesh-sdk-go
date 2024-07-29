@@ -23,11 +23,15 @@ import (
 	"fmt"
 	"math/big"
 
+	"golang.org/x/crypto/sha3"
+
 	"github.com/btcsuite/btcd/btcec"
 	"github.com/coinbase/kryptology/pkg/signatures/schnorr/mina"
 
 	"github.com/coinbase/rosetta-sdk-go/asserter"
 	"github.com/coinbase/rosetta-sdk-go/types"
+
+	nemcrypto "github.com/NemProject/nem/gocrypto"
 )
 
 // PrivKeyBytesLen are 32-bytes for all supported curvetypes
@@ -86,6 +90,19 @@ func ImportPrivateKey(privKeyHex string, curve types.CurveType) (*KeyPair, error
 
 		pubKey := &types.PublicKey{
 			Bytes:     rawPrivKey.Public().(ed25519.PublicKey),
+			CurveType: curve,
+		}
+
+		keyPair = &KeyPair{
+			PublicKey:  pubKey,
+			PrivateKey: rawPrivKey.Seed(),
+		}
+	case types.Edwards25519_Keccak:
+		hasher := sha3.NewLegacyKeccak512()
+		rawPrivKey := nemcrypto.NewKeyFromSeed(privKey, hasher)
+
+		pubKey := &types.PublicKey{
+			Bytes:     rawPrivKey.Public().(nemcrypto.PublicKey),
 			CurveType: curve,
 		}
 
@@ -192,6 +209,25 @@ func GenerateKeypair(curve types.CurveType) (*KeyPair, error) {
 			PublicKey:  pubKey,
 			PrivateKey: rawPrivKey.Seed(),
 		}
+	case types.Edwards25519_Keccak:
+		hasher := sha3.NewLegacyKeccak512()
+		rawPubKey, rawPrivKey, err := nemcrypto.GenerateKey(nil, hasher)
+		if err != nil {
+			return nil, fmt.Errorf(
+				"failed to generate key pair for edwards25519 curve type: %w",
+				err,
+			)
+		}
+
+		pubKey := &types.PublicKey{
+			Bytes:     rawPubKey,
+			CurveType: curve,
+		}
+
+		keyPair = &KeyPair{
+			PublicKey:  pubKey,
+			PrivateKey: rawPrivKey.Seed(),
+		}
 	case types.Secp256r1:
 		crv := elliptic.P256()
 		rawPrivKey, err := ecdsa.GenerateKey(crv, rand.Reader)
@@ -265,6 +301,8 @@ func (k *KeyPair) Signer() (Signer, error) {
 		return &SignerSecp256k1{k}, nil
 	case types.Edwards25519:
 		return &SignerEdwards25519{k}, nil
+	case types.Edwards25519_Keccak:
+		return &SignerEdwards25519Keccak{k}, nil
 	case types.Secp256r1:
 		return &SignerSecp256r1{k}, nil
 	case types.Pallas:

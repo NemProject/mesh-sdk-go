@@ -247,7 +247,7 @@ func CurveType(
 	curve types.CurveType,
 ) error {
 	switch curve {
-	case types.Secp256k1, types.Secp256r1, types.Edwards25519, types.Tweedle, types.Pallas:
+	case types.Secp256k1, types.Secp256r1, types.Edwards25519, types.Edwards25519_Keccak, types.Tweedle, types.Pallas:
 		return nil
 	default:
 		return ErrCurveTypeNotSupported
@@ -356,7 +356,7 @@ func SignatureType(
 	signature types.SignatureType,
 ) error {
 	switch signature {
-	case types.Ecdsa, types.EcdsaRecovery, types.Ed25519, types.Schnorr1, types.SchnorrPoseidon:
+	case types.Ecdsa, types.EcdsaRecovery, types.Ed25519, types.Ed25519_Keccak, types.Schnorr1, types.SchnorrPoseidon:
 		return nil
 	default:
 		return ErrSignatureTypeNotSupported
