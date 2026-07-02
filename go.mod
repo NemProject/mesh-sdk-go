@@ -1,6 +1,6 @@
 module github.com/coinbase/rosetta-sdk-go
 
-go 1.22.5
+go 1.25.0
 
 require (
 	github.com/DataDog/zstd v1.5.2
@@ -46,9 +46,9 @@ require (
 	github.com/tidwall/match v1.1.1 // indirect
 	github.com/tidwall/pretty v1.2.0 // indirect
 	github.com/vmihailenco/tagparser/v2 v2.0.0 // indirect
-	golang.org/x/crypto v0.25.0 // indirect
-	golang.org/x/net v0.21.0 // indirect
-	golang.org/x/sys v0.22.0 // indirect
+	golang.org/x/crypto v0.51.0 // indirect
+	golang.org/x/net v0.55.0 // indirect
+	golang.org/x/sys v0.45.0 // indirect
 	google.golang.org/protobuf v1.26.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
